@@ -40,7 +40,9 @@ h3 {
 #demo-url,
 #demo-response,
 #demo-url-cookie,
-#demo-response-cookie {
+#demo-response-cookie,
+#demo-url-custom-token,
+#demo-response-custom-token {
   font-weight: bold;
 }
 #demo-signed-in-card {

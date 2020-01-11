@@ -48,6 +48,7 @@
             <strong>Now sign in!</strong>
           </p>
           <button id="demo-sign-in-button" class="mdl-color-text--grey-700 mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign in with Google</button>
+          <button id="demo-sign-in-custom-token-button" class="mdl-color-text--grey-700 mdl-button--raised mdl-button mdl-js-button mdl-js-ripple-effect"><i class="material-icons">account_circle</i> Sign in with custom token</button>
         </div>
       </div>
 
@@ -66,6 +67,14 @@
             Sending XHR with "__session" cookie to:<br>
             <span id="demo-url-cookie"></span><br><br>
             Response: <span id="demo-response-cookie">...</span>
+          </p>
+
+          <hr />
+
+          <p>
+            Getting custom token with "Authorization" header:<br>
+            <span id="demo-url-custom-token"></span><br><br>
+            Response: <span id="demo-response-custom-token">...</span>
           </p>
 
           <hr />

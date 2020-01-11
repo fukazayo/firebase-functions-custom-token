@@ -20,17 +20,22 @@ function Demo() {
   document.addEventListener('DOMContentLoaded', function() {
     // Shortcuts to DOM Elements.
     this.signInButton = document.getElementById('demo-sign-in-button');
+    this.signInCustomTokenButton = document.getElementById('demo-sign-in-custom-token-button');
     this.signOutButton = document.getElementById('demo-sign-out-button');
     this.responseContainer = document.getElementById('demo-response');
     this.responseContainerCookie = document.getElementById('demo-response-cookie');
+    this.responseContainerCustomToken = document.getElementById('demo-response-custom-token');
     this.urlContainer = document.getElementById('demo-url');
     this.urlContainerCookie = document.getElementById('demo-url-cookie');
+    this.urlContainerCustomToken = document.getElementById('demo-url-custom-token');
     this.helloUserUrl = window.location.href + 'hello';
     this.signedOutCard = document.getElementById('demo-signed-out-card');
     this.signedInCard = document.getElementById('demo-signed-in-card');
+    this.customTokenUrl = window.location.href + 'custom_token';
 
     // Bind events.
     this.signInButton.addEventListener('click', this.signIn.bind(this));
+    this.signInCustomTokenButton.addEventListener('click', this.signInCustomToken.bind(this));
     this.signOutButton.addEventListener('click', this.signOut.bind(this));
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged.bind(this));
   }.bind(this));
@@ -41,10 +46,12 @@ Demo.prototype.onAuthStateChanged = function(user) {
   if (user) {
     this.urlContainer.textContent = this.helloUserUrl;
     this.urlContainerCookie.textContent = this.helloUserUrl;
+    this.urlContainerCustomToken.textContent = this.customTokenUrl;
     this.signedOutCard.style.display = 'none';
     this.signedInCard.style.display = 'block';
     this.startFunctionsRequest();
     this.startFunctionsCookieRequest();
+    this.startFunctionsCustomTokenRequest();
   } else {
     this.signedOutCard.style.display = 'block';
     this.signedInCard.style.display = 'none';
@@ -54,6 +61,18 @@ Demo.prototype.onAuthStateChanged = function(user) {
 // Initiates the sign-in flow using GoogleAuthProvider sign in in a popup.
 Demo.prototype.signIn = function() {
   firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+};
+
+Demo.prototype.signInCustomToken = function() {
+  var cookies = document.cookie;
+  var cookiesArray = cookies.split(';');
+  for (var c of cookiesArray) {
+    var cArray = c.split('=');
+    if (cArray[0] == 'custom_token') {
+      firebase.auth().signInWithCustomToken(cArray[1])
+      return
+    }
+  }
 };
 
 // Signs-out of Firebase.
@@ -96,6 +115,22 @@ Demo.prototype.startFunctionsCookieRequest = function() {
       this.responseContainerCookie.innerText = 'There was an error';
     }.bind(this);
     req.open('GET', this.helloUserUrl, true);
+    req.send();
+  }.bind(this));
+};
+
+Demo.prototype.startFunctionsCustomTokenRequest = function() {
+  firebase.auth().currentUser.getIdToken().then(function(token) {
+    console.log('Sending request to', this.customTokenUrl, 'with ID token in Authorization header.');
+    var req = new XMLHttpRequest();
+    req.onload = function() {
+      this.responseContainerCustomToken.innerText = req.responseText;
+    }.bind(this);
+    req.onerror = function() {
+      this.responseContainerCustomToken.innerText = 'There was an error';
+    }.bind(this);
+    req.open('GET', this.customTokenUrl, true);
+    req.setRequestHeader('Authorization', 'Bearer ' + token);
     req.send();
   }.bind(this));
 };

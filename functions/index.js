@@ -75,6 +75,20 @@ app.get('/hello', (req, res) => {
   res.send(`Hello ${req.user.name}`);
 });
 
+app.get('/custom_token', (req, res) => {
+  const expiresIn = 60 * 60 * 24 * 5 * 1000;
+
+  admin.auth().createCustomToken(req.user.uid)
+    .then(function(customToken) {
+      const options = {maxAge: expiresIn, httpOnly: true, secure: true};
+      res.end(JSON.stringify({custom_token: customToken}))
+    })
+    .catch(function(error) {
+      console.error('Failed to create custom token:', error);
+      res.status(403).send('Forbidden');
+    });
+});
+
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
