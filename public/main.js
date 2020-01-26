@@ -38,6 +38,9 @@ function Demo() {
     this.signInCustomTokenButton.addEventListener('click', this.signInCustomToken.bind(this));
     this.signOutButton.addEventListener('click', this.signOut.bind(this));
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged.bind(this));
+
+    // Try to sign-in with custom token in local storage.
+    this.signInCustomTokenInLocalStorage();
   }.bind(this));
 }
 
@@ -80,6 +83,16 @@ Demo.prototype.signOut = function() {
   firebase.auth().signOut();
   // clear the __session cookie
   document.cookie = '__session=';
+
+  if (navigator.userAgent.indexOf('Android') > 0) {
+    // Send Signs-out message to Android
+    alert("signOut");
+  }
+
+  if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 || navigator.userAgent.indexOf('iPod') > 0) {
+    // Send Signs-out message to iOS
+    window.webkit.messageHandlers.signOut.postMessage("");
+  }
 };
 
 // Does an authenticated request to a Firebase Functions endpoint using an Authorization header.
@@ -133,6 +146,13 @@ Demo.prototype.startFunctionsCustomTokenRequest = function() {
     req.setRequestHeader('Authorization', 'Bearer ' + token);
     req.send();
   }.bind(this));
+};
+
+Demo.prototype.signInCustomTokenInLocalStorage = function() {
+  var customToken = localStorage.getItem("custom_token");
+  if (customToken) {
+    firebase.auth().signInWithCustomToken(customToken)
+  }
 };
 
 // Load the demo.
